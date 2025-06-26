@@ -1,0 +1,35 @@
+<form id="form-komentar">
+  <input type="text" id="nama" placeholder="Nama" required>
+  <input type="text" id="komentar" placeholder="Komentar" required>
+  <button type="submit">Kirim</button>
+  <div id="status"></div>
+</form>
+
+<script>
+  document.getElementById("form-komentar").addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    const nama = document.getElementById("nama").value;
+    const komentar = document.getElementById("komentar").value;
+    const status = document.getElementById("status");
+
+    fetch("https://script.google.com/macros/s/AKfycbyDuaVRpftmYDhEucbu20xcjXWwIIrF6KXNkN7jjLvJHDUC-7fkzYD3IUoNSgg8dwY1qw/exec", {
+      method: "POST",
+      body: JSON.stringify({ nama: nama, komentar: komentar }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.result === "success") {
+        status.innerText = "✅ Berhasil dikirim!";
+      } else {
+        status.innerText = "❌ Gagal: " + data.message;
+      }
+    })
+    .catch((err) => {
+      status.innerText = "❌ Terjadi kesalahan.";
+    });
+  });
+</script>

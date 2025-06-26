@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Upload Produk Rental</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        :root {
+            --primary-color: #3b5d50;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.2);
+        }
+
+        .file-upload {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .file-upload input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .file-upload-label:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(74, 107, 255, 0.05);
+        }
+
+        .file-upload-label i {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .file-upload-label span {
+            font-size: 16px;
+            color: var(--secondary-color);
+        }
+
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .map-container {
+            margin-top: 20px;
+        }
+
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .coordinates-display {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: var(--light-color);
+            border-radius: 5px;
+            font-family: monospace;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #3a5bef;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .form-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+
+        .required:after {
+            content: " *";
+            color: var(--danger-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Upload Produk Rental</h1>
+            <p>Isi formulir berikut untuk menambahkan produk rental Anda</p>
+        </header>
+
+        <div class="form-container">
+            <form id="rentalForm">
+                <div class="form-group">
+                    <label for="productName" class="required">Nama Produk</label>
+                    <input type="text" id="productName" name="productName" required
+                        placeholder="Contoh: Sepeda Gunung Polygon">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Deskripsi Produk</label>
+                    <textarea id="description" name="description" rows="4"
+                        placeholder="Deskripsikan produk Anda secara detail"></textarea>
+                </div>
+
+                <div class="form-group">
+                  
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="price" class="required">Harga Sewa per Hari (Rp)</label>
+                    <input type="text" id="price" name="price" required placeholder="Contoh: 50000">
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Foto Produk</label>
+                    <div class="file-upload">
+                        <input type="file" id="productImages" name="productImages" accept="image/*" multiple required>
+                        <label for="productImages" class="file-upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Klik atau tarik file ke sini untuk mengupload</span>
+                        </label>
+                    </div>
+                    <div class="preview-container" id="imagePreview"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ownerName" class="required">Nama Pemilik</label>
+                    <input type="text" id="ownerName" name="ownerName" required placeholder="Nama lengkap Anda">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="required">Nomor HP</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="Contoh: 081234567890">
+                </div>
+
+                <div class="form-group">
+                    
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Lokasi Produk</label>
+                    <p style="margin-bottom: 10px; color: var(--secondary-color);">Klik pada peta untuk menentukan
+                        lokasi produk</p>
+                    <div id="map" class="map-container"></div>
+                    <div class="coordinates-display">
+                        Koordinat: <span id="coordinates">Belum dipilih</span>
+                    </div>
+                    <input type="hidden" id="latitude" name="latitude" required>
+                    <input type="hidden" id="longitude" name="longitude" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Alamat Lengkap</label>
+                    <textarea id="address" name="address" rows="3"
+                        placeholder="Tambahkan alamat lengkap untuk memudahkan penyewa"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="terms">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        Saya menyetujui syarat dan ketentuan yang berlaku
+                    </label>
+                </div>
+
+                
+             
+
+                <div class="form-footer">
+                    <p></p>
+
+                    <a href="shop copy.html" class="btn">Submit Produk</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Inisialisasi peta dengan view ke Indonesia
+            const map = L.map('map').setView([-2.5489, 118.0149], 5);
+
+            // Tambahkan tile layer dari OpenStreetMap
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            let marker = null;
+            const coordinatesDisplay = document.getElementById('coordinates');
+            const latitudeInput = document.getElementById('latitude');
+            const longitudeInput = document.getElementById('longitude');
+            const addressTextarea = document.getElementById('address');
+            const imagePreview = document.getElementById('imagePreview');
+            const fileInput = document.getElementById('productImages');
+
+            // Fungsi untuk menambahkan marker pada peta
+            function addMarker(e) {
+                // Hapus marker sebelumnya jika ada
+                if (marker) {
+                    map.removeLayer(marker);
+                }
+
+                // Tambahkan marker baru
+                marker = L.marker(e.latlng).addTo(map)
+                    .bindPopup(`Lokasi terpilih:<br>${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`)
+                    .openPopup();
+
+                // Update tampilan koordinat
+                updateCoordinateDisplay(e.latlng);
+
+                // Coba dapatkan alamat (reverse geocoding)
+                getAddress(e.latlng.lat, e.latlng.lng);
+            }
+
+            // Fungsi untuk update tampilan koordinat
+            function updateCoordinateDisplay(latlng) {
+                coordinatesDisplay.textContent = `${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}`;
+                latitudeInput.value = latlng.lat;
+                longitudeInput.value = latlng.lng;
+            }
+
+            // Fungsi untuk mendapatkan alamat dari koordinat
+            function getAddress(lat, lng) {
+                addressTextarea.placeholder = "Mendeteksi alamat...";
+
+                // Menggunakan Nominatim API dari OpenStreetMap untuk reverse geocoding
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.display_name) {
+                            addressTextarea.value = data.display_name;
+                        } else {
+                            addressTextarea.placeholder = "Alamat tidak ditemukan (silahkan isi manual)";
+                        }
+                    })
+                    .catch(() => {
+                        addressTextarea.placeholder = "Gagal mendapatkan alamat (silahkan isi manual)";
+                    });
+            }
+
+            // Event listener untuk klik pada peta
+            map.on('click', addMarker);
+
+            // Handle image preview
+            fileInput.addEventListener('change', function () {
+                imagePreview.innerHTML = '';
+
+                if (this.files) {
+                    Array.from(this.files).forEach(file => {
+                        if (file.type.match('image.*')) {
+                            const reader = new FileReader();
+
+                            reader.onload = function (e) {
+                                const previewItem = document.createElement('div');
+                                previewItem.className = 'preview-item';
+
+                                const img = document.createElement('img');
+                                img.src = e.target.result;
+
+                                const removeBtn = document.createElement('button');
+                                removeBtn.className = 'remove-btn';
+                                removeBtn.innerHTML = '&times;';
+                                removeBtn.onclick = function () {
+                                    previewItem.remove();
+                                    // TODO: Handle file removal from input
+                                };
+
+                                previewItem.appendChild(img);
+                                previewItem.appendChild(removeBtn);
+                                imagePreview.appendChild(previewItem);
+                            }
+
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+            });
+
+            // Form submission
+            document.getElementById('rentalForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Validasi sederhana
+                if (!marker) {
+                    alert('Silahkan tentukan lokasi produk pada peta');
+                    return;
+                }
+
+                // Tampilkan data yang akan dikirim (pada implementasi nyata, ini akan dikirim ke server)
+                const formData = new FormData(this);
+                const data = {};
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+
+                console.log('Data yang akan dikirim:', data);
+                alert('Formulir berhasil disubmit! (Lihat console untuk detail)');
+
+                // Reset form setelah submit
+                this.reset();
+                imagePreview.innerHTML = '';
+                coordinatesDisplay.textContent = 'Belum dipilih';
+                latitudeInput.value = '';
+                longitudeInput.value = '';
+                if (marker) {
+                    map.removeLayer(marker);
+                    marker = null;
+                }
+            });
+
+            // Tambahkan skala ke peta
+            L.control.scale().addTo(map);
+        });
+    </script>
+</body>
+
+</html>

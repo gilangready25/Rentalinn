@@ -1,0 +1,37 @@
+<form id="testiForm">
+  <input type="text" id="nama" placeholder="Masukkan nama" required>
+  <input type="text" id="komentar" placeholder="Berikan komentar" required>
+  <button type="submit">Kirim</button>
+  <div id="pesan"></div>
+</form>
+
+<script>
+  document.getElementById("testiForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    const nama = document.getElementById("nama").value.trim();
+    const komentar = document.getElementById("komentar").value.trim();
+    const pesan = document.getElementById("pesan");
+
+    fetch("https://script.google.com/macros/s/AKfycbx8WQtcivZZI7XxwEkPAYrb6KeAIU2K_CVkOWMqY_Q9C23ACo18Hz0PvcWduLG5WK8hMw/exec", { // 🔁 GANTI dengan URL Web App Anda
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ nama, komentar })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result === "success") {
+        pesan.innerHTML = "Testimoni berhasil dikirim!";
+        document.getElementById("testiForm").reset();
+      } else {
+        pesan.innerHTML = "Gagal mengirim.";
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      pesan.innerHTML = "Terjadi kesalahan.";
+    });
+  });
+</script>
